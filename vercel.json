@@ -1,1 +1,1 @@
-{"functions":{"api/analyze.js":{"maxDuration":60}},"rewrites":[{"source":"/","destination":"/public/index.html"}]}
+{"outputDirectory":"public","functions":{"api/analyze.js":{"maxDuration":60}}}
