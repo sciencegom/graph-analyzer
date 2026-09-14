@@ -19,7 +19,7 @@ test('Gemini image request and JSON response adapter',async()=>{
       const body=JSON.parse(options.body);
       assert.equal(body.contents[0].parts[1].inlineData.mimeType,'image/png');
       assert.equal(body.contents[0].parts[1].inlineData.data,'aGVsbG8=');
-      assert.equal(body.generationConfig.responseFormat.text.mimeType,'application/json');
+      assert.equal(body.generationConfig.responseMimeType,'application/json');
       return {ok:true,json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(fixture())}]}}]})};
     };
     await handler({method:'POST',headers:{'x-analyzer-code':'test-code'},body:{image:'data:image/png;base64,aGVsbG8='}},res);
