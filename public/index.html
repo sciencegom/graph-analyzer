@@ -353,6 +353,7 @@
       }
     }
     .tabs .tab{flex:1;text-align:left;padding:16px 20px}.tab small{display:block;font-size:12px;font-weight:400;margin-top:6px;line-height:1.5}.input-panel{margin-bottom:18px}.input-panel .panel-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.input-panel textarea,.input-panel .hint{grid-column:1/-1}.input-panel .section-title{margin-top:0}.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}.best{font-size:10px;padding:3px 6px;border-radius:20px;background:#eaf1ff;color:#2563eb;white-space:nowrap}.axis-controls{gap:12px}.axis-controls label{font-size:12px;color:var(--muted)}.axis-controls input[type=number]{width:130px;display:block;margin-top:4px}.axis-controls .check{display:flex;align-items:center;gap:6px}.check input{width:auto}.drag-over{background:#eaf1ff;border:2px dashed #2563eb}.image-stage{min-height:450px}.comparison-grid{grid-template-columns:300px minmax(0,1fr)}input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #93b4ff;outline-offset:2px}canvas{touch-action:none}table{min-width:430px}#comparePage .panel-body{overflow-x:auto}@media(max-width:1000px){.comparison-grid{grid-template-columns:1fr}}@media(max-width:600px){.app{padding:12px}.tabs{flex-direction:column}.topbar{align-items:flex-start}.brand h1{font-size:20px}.input-panel .panel-body{display:block}.image-stage{min-height:280px}.empty{padding:24px}.panel-header{flex-wrap:wrap}}
+    [hidden]{display:none!important}
   </style>
 </head>
 
@@ -411,7 +412,17 @@
         </div>
 
         <div class="panel-body">
-          <div class="chart-wrap" id="chartWrap">
+          <div class="toolbar" style="margin-bottom:12px">
+<button id="rangeMode" class="primary" aria-pressed="true" onclick="setGraphMode('range')">구간 분석</button>
+<button id="lineMode" aria-pressed="false" onclick="setGraphMode('line')">직선으로 기울기 이해</button>
+<button onclick="resetLearningLine()">직선 초기화</button>
+<label class="hint"><input type="checkbox" id="showRegression" style="width:auto" onchange="mainChart.draw()"> 회귀 직선 보기</label></div>
+<p id="graphModeHint" class="hint">그래프 위를 좌우로 드래그해 분석 구간을 선택하세요.</p>
+<div id="lineReadout" class="notice" hidden aria-live="polite" style="margin-bottom:12px">두 점을 선택하면 기울기를 표시합니다.</div>
+<div id="lineFields" class="two" hidden style="margin-bottom:12px">
+<div><label class="hint" for="lineAX">A점 X</label><input id="lineAX" type="number" step="any" oninput="editLearningPoint(0)"><label class="hint" for="lineAY">A점 Y</label><input id="lineAY" type="number" step="any" oninput="editLearningPoint(0)"></div>
+<div><label class="hint" for="lineBX">B점 X</label><input id="lineBX" type="number" step="any" oninput="editLearningPoint(1)"><label class="hint" for="lineBY">B점 Y</label><input id="lineBY" type="number" step="any" oninput="editLearningPoint(1)"></div></div>
+<div class="chart-wrap" id="chartWrap">
             <canvas id="mainChart"></canvas>
           </div>
         </div>
@@ -785,6 +796,7 @@ function renderMainChart(){
     }
   });
 
+  learningPoints=[]; lineMoving=null; updateLearningReadout();
   attachSelectionEvents();
 }
 
@@ -797,6 +809,7 @@ function attachSelectionEvents(){
   canvas.onpointerdown = e => {
 
     if(!mainChart) return;
+    if(graphMode === "line"){ beginLearningLine(e); return; }
 
     const rect =
       canvas.getBoundingClientRect();
@@ -826,6 +839,7 @@ function attachSelectionEvents(){
 
   canvas.onpointermove = e => {
 
+    if(graphMode === "line"){ moveLearningLine(e); return; }
     if(!dragging) return;
 
     const rect =
@@ -852,7 +866,8 @@ function attachSelectionEvents(){
   };
 
 
-  canvas.onpointerup = () => {
+  canvas.onpointerup = e => {
+    if(graphMode === "line"){ finishLearningLine(e); return; }
 
     if(!dragging) return;
 
@@ -861,7 +876,9 @@ function attachSelectionEvents(){
     analyzeSelection();
   };
 
+  canvas.onpointercancel = e => { finishLearningLine(e); dragging=false; };
   canvas.onpointerleave = () => {
+    if(graphMode === "line") return;
 
     if(dragging){
       dragging = false;
@@ -1711,6 +1728,60 @@ function downloadRecognizedCSV(){
   const blob=new Blob(['\ufeff'+document.getElementById('recognizedData').value.split(/\r?\n/).map(line=>line.split('\t').map(v=>'"'+v.replaceAll('"','""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ScienceGOM_image_data.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+
+
+let graphMode='range',learningPoints=[],lineMoving=null;
+function setGraphMode(mode){
+  graphMode=mode;dragging=false;lineMoving=null;
+  ['range','line'].forEach(name=>{const b=document.getElementById(name+'Mode');b.classList.toggle('primary',name===mode);b.setAttribute('aria-pressed',String(name===mode));});
+  document.getElementById('lineReadout').hidden=mode!=='line';document.getElementById('lineFields').hidden=mode!=='line';
+  document.getElementById('graphModeHint').textContent=mode==='line'?'그래프 위 두 점을 클릭하거나 드래그해 직선을 그리세요. 끝점을 끌거나 아래 좌표를 입력해 이동할 수 있습니다. 자유롭게 그린 두 점의 기울기이며 회귀 기울기와는 다릅니다.':'그래프 위를 좌우로 드래그해 분석 구간을 선택하세요.';
+  updateLearningReadout();if(mainChart)mainChart.draw();
+}
+function resetLearningLine(){learningPoints=[];lineMoving=null;updateLearningReadout();if(mainChart)mainChart.draw();}
+function linePixel(e){const r=mainChart.canvas.getBoundingClientRect(),a=mainChart.chartArea;return {x:Math.max(a.left,Math.min(a.right,(e.clientX-r.left)*mainChart.width/r.width)),y:Math.max(a.top,Math.min(a.bottom,(e.clientY-r.top)*mainChart.height/r.height))};}
+function lineValue(p){return {x:mainChart.scales.x.getValueForPixel(p.x),y:mainChart.scales.y.getValueForPixel(p.y)};}
+function beginLearningLine(e){
+  const r=mainChart.canvas.getBoundingClientRect(),a=mainChart.chartArea;
+  const x=(e.clientX-r.left)*mainChart.width/r.width,y=(e.clientY-r.top)*mainChart.height/r.height;
+  if(x<a.left||x>a.right||y<a.top||y>a.bottom)return;
+  const p=linePixel(e);
+  const hit=learningPoints.findIndex(v=>Math.hypot(mainChart.scales.x.getPixelForValue(v.x)-p.x,mainChart.scales.y.getPixelForValue(v.y)-p.y)<16);
+  if(hit>=0)lineMoving=hit;
+  else if(learningPoints.length===1){learningPoints.push(lineValue(p));lineMoving=1;}
+  else{learningPoints=[lineValue(p)];lineMoving=0;}
+  mainChart.canvas.setPointerCapture(e.pointerId);updateLearningReadout();mainChart.draw();
+}
+function moveLearningLine(e){
+  if(lineMoving===null)return;
+  const p=linePixel(e);
+  if(learningPoints.length===1){const a=learningPoints[0];if(Math.hypot(mainChart.scales.x.getPixelForValue(a.x)-p.x,mainChart.scales.y.getPixelForValue(a.y)-p.y)<4)return;learningPoints.push(lineValue(p));lineMoving=1;}
+  else learningPoints[lineMoving]=lineValue(p);
+  updateLearningReadout();mainChart.draw();
+}
+function finishLearningLine(e){lineMoving=null;if(e && mainChart?.canvas.hasPointerCapture?.(e.pointerId))mainChart.canvas.releasePointerCapture(e.pointerId);}
+function editLearningPoint(i){const prefix=i?'lineB':'lineA',x=document.getElementById(prefix+'X').value,y=document.getElementById(prefix+'Y').value;if(!learningPoints[i]||x===''||y===''||!Number.isFinite(Number(x))||!Number.isFinite(Number(y)))return;learningPoints[i]={x:Number(x),y:Number(y)};updateLearningReadout(false);mainChart.draw();}
+function updateLearningReadout(sync=true){
+  if(sync)['lineA','lineB'].forEach((prefix,i)=>['X','Y'].forEach(axis=>document.getElementById(prefix+axis).value=learningPoints[i]?Number(learningPoints[i][axis.toLowerCase()].toPrecision(8)):''));
+  const box=document.getElementById('lineReadout');
+  if(learningPoints.length<2){box.textContent=learningPoints.length?'A점을 선택했습니다. B점을 클릭하거나 드래그하세요.':'두 점을 선택하면 ΔX·ΔY와 기울기를 표시합니다.';return;}
+  const [a,b]=learningPoints,dx=b.x-a.x,dy=b.y-a.y;
+  box.textContent=`A(${f(a.x,3)}, ${f(a.y,3)}) → B(${f(b.x,3)}, ${f(b.y,3)}) · ΔX = ${f(dx,4)} · ΔY = ${f(dy,4)} · `+(dx===0?'수직선입니다. ΔX가 0이므로 기울기를 계산할 수 없습니다.':`기울기 = ΔY ÷ ΔX = ${f(dy,4)} ÷ ${f(dx,4)} = ${f(dy/dx,4)} (Y축 단위 / X축 단위)`);
+}
+const learningLinePlugin={id:'learningLine',afterDatasetsDraw(chart){
+  if(chart.canvas.id!=='mainChart')return;
+  const {ctx,chartArea:a,scales}=chart;
+  ctx.save();ctx.beginPath();ctx.rect(a.left,a.top,a.right-a.left,a.bottom-a.top);ctx.clip();
+  function segment(p,q,color,dash=[]){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}
+  if(document.getElementById('showRegression').checked && currentStats){const s=currentStats;segment({x:scales.x.getPixelForValue(s.minX),y:scales.y.getPixelForValue(s.slope*s.minX+s.intercept)},{x:scales.x.getPixelForValue(s.maxX),y:scales.y.getPixelForValue(s.slope*s.maxX+s.intercept)},'#059669',[7,4]);}
+  if(graphMode==='line' && learningPoints.length){
+    const points=learningPoints.map(p=>({x:scales.x.getPixelForValue(p.x),y:scales.y.getPixelForValue(p.y)}));
+    if(points.length===2){const [p,q]=points,corner={x:q.x,y:p.y};segment(p,corner,'#2563eb',[5,4]);segment(corner,q,'#ea580c',[5,4]);segment(p,q,'#7c3aed');ctx.setLineDash([]);ctx.font='bold 13px "Malgun Gothic",sans-serif';ctx.fillStyle='#2563eb';ctx.fillText('ΔX',(p.x+q.x)/2,p.y-9);ctx.fillStyle='#ea580c';ctx.fillText('ΔY',q.x+9,(p.y+q.y)/2);}
+    ctx.setLineDash([]);points.forEach((p,i)=>{ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fill();ctx.fillText(i?'B':'A',p.x+10,p.y-10);});
+  }
+  ctx.restore();
+}};
+Chart.register(learningLinePlugin);
 
 /* INIT */
 
