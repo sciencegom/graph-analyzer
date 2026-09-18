@@ -52,8 +52,18 @@
     }
 
     .brand h1{
+      display:flex;
+      align-items:center;
+      gap:10px;
       margin:0;
       font-size:24px;
+    }
+
+    .brand-icon{
+      width:1.67em;
+      height:1.67em;
+      flex-shrink:0;
+      object-fit:contain;
     }
 
     .brand p{
@@ -363,7 +373,7 @@
 
   <div class="topbar">
     <div class="brand">
-      <h1>ScienceGOM Graph Analyzer</h1>
+      <h1><img class="brand-icon" src="/favicon.png" alt="" width="40" height="40" /><span>ScienceGOM Graph Analyzer</span></h1>
       <p>실험 그래프의 특정 구간을 선택하고 변화율·회귀·면적을 분석합니다.</p>
     </div>
     <div class="badge">v0.3</div>
