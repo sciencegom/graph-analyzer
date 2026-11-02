@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ScienceGOM Graph Analyzer v0.3</title>
+  <title>ScienceGOM Graph Analyzer v0.4</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
@@ -42,6 +44,8 @@
       padding:22px;
     }
 
+    .brand-lockup{display:flex;align-items:center;gap:13px;min-width:0}
+    .brand-logo{width:46px;height:46px;object-fit:contain;border-radius:12px;flex:0 0 auto}
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -352,7 +356,8 @@
         height:390px;
       }
     }
-    .calibration-layout{display:grid;grid-template-columns:minmax(300px,.75fr) minmax(0,1.25fr);gap:24px}.calibration-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.calibration-chart{height:430px;position:relative}.calibration-chart-head{display:flex;justify-content:space-between;gap:12px}.table-scroll{overflow-x:auto}.range-ok{color:#15803d;font-weight:700}.range-warn{color:#b45309;font-weight:700}
+    .calibration-layout{display:grid;grid-template-columns:minmax(360px,.8fr) minmax(0,1.2fr);gap:24px}.calibration-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.calibration-chart{height:430px;position:relative}.calibration-chart-head{display:flex;justify-content:space-between;gap:12px}.table-scroll{overflow-x:auto}.range-ok{color:#15803d;font-weight:700}.range-warn{color:#b45309;font-weight:700}
+    .sheet-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0}.sheet-toolbar .hint{margin:0}.sheet-actions{display:flex;gap:6px;white-space:nowrap}.sheet-actions button{padding:7px 10px;font-size:12px}.unknown-sheet{max-height:310px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}.unknown-sheet table{width:100%;min-width:0;border-collapse:separate;border-spacing:0}.unknown-sheet th{position:sticky;top:0;z-index:2;background:#f4f7fc;color:#526078;font-size:12px;text-align:left;padding:9px;border-bottom:1px solid var(--line)}.unknown-sheet td{padding:0;border-bottom:1px solid #edf1f7;border-right:1px solid #edf1f7}.unknown-sheet td:last-child{border-right:0;width:38px}.unknown-sheet input{width:100%;border:0;border-radius:0;padding:9px;background:transparent}.unknown-sheet input:focus{position:relative;z-index:1;outline:2px solid var(--primary);outline-offset:-2px;background:#fff}.unknown-sheet .row-delete{width:100%;height:38px;padding:0;border:0;background:transparent;color:#9aa5b8}.unknown-sheet .row-delete:hover{color:#dc2626;background:#fff1f2}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
     .tabs .tab{flex:1;text-align:left;padding:16px 20px}.tab small{display:block;font-size:12px;font-weight:400;margin-top:6px;line-height:1.5}.input-panel{margin-bottom:18px}.input-panel .panel-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.input-panel textarea,.input-panel .hint{grid-column:1/-1}.input-panel .section-title{margin-top:0}.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}.best{font-size:10px;padding:3px 6px;border-radius:20px;background:#eaf1ff;color:#2563eb;white-space:nowrap}.axis-controls{gap:12px}.axis-controls label{font-size:12px;color:var(--muted)}.axis-controls input[type=number]{width:130px;display:block;margin-top:4px}.axis-controls .check{display:flex;align-items:center;gap:6px}.check input{width:auto}.drag-over{background:#eaf1ff;border:2px dashed #2563eb}.image-stage{min-height:450px}.comparison-grid{grid-template-columns:300px minmax(0,1fr)}input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #93b4ff;outline-offset:2px}canvas{touch-action:none}table{min-width:430px}#comparePage .panel-body{overflow-x:auto}@media(max-width:1000px){.comparison-grid,.calibration-layout{grid-template-columns:1fr}}@media(max-width:600px){.app{padding:12px}.tabs{flex-direction:column}.topbar{align-items:flex-start}.brand h1{font-size:20px}.input-panel .panel-body{display:block}.image-stage{min-height:280px}.empty{padding:24px}.panel-header{flex-wrap:wrap}}
     [hidden]{display:none!important}
   </style>
@@ -362,11 +367,14 @@
 <div class="app">
 
   <div class="topbar">
-    <div class="brand">
-      <h1>ScienceGOM Graph Analyzer</h1>
-      <p>실험 그래프의 특정 구간을 선택하고 변화율·회귀·면적을 분석합니다.</p>
+    <div class="brand-lockup">
+      <img class="brand-logo" src="/favicon.png" alt="ScienceGOM 로고" />
+      <div class="brand">
+        <h1>ScienceGOM Graph Analyzer</h1>
+        <p>실험 그래프의 특정 구간을 선택하고 변화율·회귀·면적을 분석합니다.</p>
+      </div>
     </div>
-    <div class="badge">v0.3</div>
+    <div class="badge">v0.4</div>
   </div>
 
   <div class="tabs" aria-label="그래프 분석 작업 단계">
@@ -598,8 +606,11 @@
               <div class="field"><label>Y축 이름·단위</label><input id="calYLabel" value="흡광도" oninput="updateCalibration()"></div>
             </div>
             <div class="section-title">STEP 2 · 미지시료 입력</div>
-            <p class="hint">Excel·Google Sheets에서 붙여넣을 수 있습니다. 입력할 때마다 농도와 그래프가 즉시 갱신됩니다.</p>
-            <textarea id="unknownInput" oninput="updateCalibration()" placeholder="시료명&#9;흡광도&#9;희석배수&#10;미지 A&#9;0.302&#9;1&#10;미지 B&#9;0.421&#9;10"></textarea>
+            <div class="sheet-toolbar"><p class="hint">셀에 직접 입력하거나 Excel·Google Sheets의 여러 셀을 복사해 첫 셀에 붙여넣으세요.</p><div class="sheet-actions"><button type="button" onclick="addUnknownRow()">＋ 빈 행</button><button type="button" onclick="clearUnknownGrid()">전체 지우기</button></div></div>
+            <div id="unknownSheet" class="unknown-sheet" aria-label="미지시료 입력 표">
+              <table><thead><tr><th>시료명</th><th>흡광도</th><th>희석배수</th><th aria-label="행 삭제"></th></tr></thead><tbody id="unknownGrid"></tbody></table>
+            </div>
+            <textarea id="unknownInput" class="sr-only" tabindex="-1" aria-hidden="true"></textarea>
             <div class="two">
               <div class="field"><label>블랭크 흡광도</label><input id="calBlank" type="number" step="any" value="0" oninput="updateCalibration()"></div>
               <div class="field"><label>표시 소수 자릿수</label><select id="calDigits" onchange="updateCalibration()"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></div>
@@ -648,7 +659,7 @@
         </div>
 
         <div class="panel-body">
-          <div class="axis-controls toolbar"><label>Y축 최소값 <input type="number" step="any" id="compareYMin"></label><label>Y축 최대값 <input type="number" step="any" id="compareYMax"></label><button onclick="applyCompareRange()">범위 적용</button><button onclick="autoCompareRange()">자동 설정</button><label class="check"><input type="checkbox" id="compareZero" onchange="renderCompareChart()"> Y축 0부터 보기</label></div><p id="axisRange" class="hint" role="status"></p><p id="compareSummary" class="notice"></p><div style="height:380px">
+          <div class="axis-controls toolbar"><label>차트 종류 <select id="compareChartType" onchange="renderCompareChart()"><option value="bar">막대그래프</option><option value="line">점-선 그래프</option><option value="scatter">산점도</option></select></label><label>Y축 최소값 <input type="number" step="any" id="compareYMin"></label><label>Y축 최대값 <input type="number" step="any" id="compareYMax"></label><button onclick="applyCompareRange()">범위 적용</button><button onclick="autoCompareRange()">자동 설정</button><label class="check"><input type="checkbox" id="compareZero" onchange="renderCompareChart()"> Y축 0부터 보기</label></div><p id="axisRange" class="hint" role="status"></p><p id="compareChartHint" class="hint"></p><p id="compareSummary" class="notice"></p><div style="height:380px">
             <canvas id="compareChart"></canvas>
           </div>
 
@@ -1431,8 +1442,10 @@ function applyCompareRange(){
 }
 const slopeLabels={id:'slopeLabels',afterDatasetsDraw(chart){
   const ctx=chart.ctx; ctx.save(); ctx.font='bold 12px "Malgun Gothic", sans-serif'; ctx.textAlign='center';
-  chart.getDatasetMeta(0).data.forEach((bar,i)=>{ctx.fillStyle=comparisons[i].color;ctx.fillText(comparisons[i].slope.toFixed(4),bar.x,Math.max(chart.chartArea.top+13,bar.y-9));});ctx.restore();
+  const shown=chart.$shownComparisons||comparisons;
+  chart.getDatasetMeta(0).data.forEach((point,i)=>{ctx.fillStyle=shown[i].color;ctx.fillText(shown[i].slope.toFixed(4),point.x,Math.max(chart.chartArea.top+13,point.y-9));});ctx.restore();
 }};
+function numericCondition(label){const match=String(label).replaceAll(',','').match(/[-+]?\d*\.?\d+(?:e[-+]?\d+)?/i);return match?Number(match[0]):null;}
 function renderCompareChart(){
   const range={...(manualCompareRange || suggestedRange())};
   if(document.getElementById('compareZero').checked){ range.min=Math.min(0,range.min);range.max=Math.max(0,range.max); }
@@ -1440,10 +1453,16 @@ function renderCompareChart(){
   document.getElementById('compareYMax').value=Number(range.max.toPrecision(8));
   document.getElementById('axisRange').textContent=`Y축 범위: ${Number(range.min.toPrecision(6))} – ${Number(range.max.toPrecision(6))} · ${manualCompareRange ? '직접 설정' : '자동 설정'} · 축 시작값에 따라 차이가 크게 보일 수 있습니다.`;
   if(compareChart) compareChart.destroy();
-  compareChart=new Chart(document.getElementById('compareChart'),{
-    type:'bar',plugins:[slopeLabels],data:{labels:comparisons.map(c=>c.label),datasets:[{label:'선형회귀 기울기',data:comparisons.map(c=>c.slope),backgroundColor:comparisons.map(c=>c.color),borderRadius:8,maxBarThickness:80}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,layout:{padding:{top:24}},plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{min:range.min,max:range.max,title:{display:true,text:'Slope'}}}}
-  });
+  const type=document.getElementById('compareChartType')?.value||'bar';
+  const hasNumeric=comparisons.length>0&&comparisons.every(c=>Number.isFinite(numericCondition(c.label)));
+  const shown=hasNumeric&&type!=='bar'?[...comparisons].sort((a,b)=>numericCondition(a.label)-numericCondition(b.label)):[...comparisons];
+  const isScatter=type==='scatter';
+  const data=isScatter?shown.map((c,i)=>({x:hasNumeric?numericCondition(c.label):i+1,y:c.slope,label:c.label})):shown.map(c=>c.slope);
+  const dataset={label:'선형회귀 기울기',data,backgroundColor:shown.map(c=>c.color),borderColor:type==='line'?'#64748b':shown.map(c=>c.color),pointBorderColor:shown.map(c=>c.color),pointBackgroundColor:shown.map(c=>c.color),pointRadius:type==='bar'?0:6,pointHoverRadius:8,borderWidth:2,tension:.22,showLine:type==='line',borderRadius:8,maxBarThickness:80};
+  const xScale=isScatter?{type:'linear',grid:{display:false},title:{display:true,text:hasNumeric?'조건값':'조건 순서'},ticks:hasNumeric?{}:{callback:value=>shown[value-1]?.label||''}}:{grid:{display:false}};
+  const config={type:type==='scatter'?'scatter':type,plugins:[slopeLabels],data:{labels:isScatter?undefined:shown.map(c=>c.label),datasets:[dataset]},options:{responsive:true,maintainAspectRatio:false,animation:false,layout:{padding:{top:24}},plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>isScatter?(items[0]?.raw?.label||''):items[0]?.label||''}}},scales:{x:xScale,y:{min:range.min,max:range.max,title:{display:true,text:'Slope'}}}}};
+  compareChart=new Chart(document.getElementById('compareChart'),config);compareChart.$shownComparisons=shown;compareChart.update('none');
+  document.getElementById('compareChartHint').textContent=type==='bar'?'범주형 조건 비교에 적합합니다.':hasNumeric?'조건명에서 숫자를 읽어 작은 값부터 정렬했습니다. 연속 조건의 변화 추세를 확인하세요.':'조건명에 숫자가 없어 입력 순서대로 표시합니다.';
 }
 
 function escapeHtml(str){
@@ -1827,6 +1846,45 @@ Chart.register(learningLinePlugin);
 
 let calibrationModel=null,calibrationChart=null;
 const calibrationColors=['#2563eb','#ea580c','#7c3aed','#059669','#db2777','#0891b2','#a16207','#4f46e5'];
+let unknownGridRows=[];
+function blankUnknownRow(){return ['','','1'];}
+function initUnknownGrid(){
+  if(!unknownGridRows.length)unknownGridRows=Array.from({length:6},blankUnknownRow);
+  renderUnknownGrid();
+  document.getElementById('unknownSheet').addEventListener('paste',handleUnknownPaste);
+}
+function renderUnknownGrid(focusRow=null,focusCol=0){
+  const body=document.getElementById('unknownGrid');if(!body)return;
+  body.innerHTML=unknownGridRows.map((r,i)=>`<tr><td><input type="text" value="${escapeHtml(r[0]||'')}" aria-label="시료 ${i+1} 이름" data-row="${i}" data-col="0" oninput="editUnknownCell(${i},0,this.value)"></td><td><input type="number" step="any" value="${escapeHtml(r[1]||'')}" aria-label="시료 ${i+1} 흡광도" data-row="${i}" data-col="1" oninput="editUnknownCell(${i},1,this.value)"></td><td><input type="number" step="any" min="0.0000001" value="${escapeHtml(r[2]||'1')}" aria-label="시료 ${i+1} 희석배수" data-row="${i}" data-col="2" oninput="editUnknownCell(${i},2,this.value)"></td><td><button class="row-delete" type="button" aria-label="시료 ${i+1} 행 삭제" onclick="deleteUnknownRow(${i})">×</button></td></tr>`).join('');
+  syncUnknownText();
+  if(focusRow!==null)requestAnimationFrame(()=>body.querySelector(`[data-row="${focusRow}"][data-col="${focusCol}"]`)?.focus());
+}
+function editUnknownCell(row,col,value){unknownGridRows[row][col]=value;syncUnknownText();updateCalibration();}
+function syncUnknownText(){
+  const used=unknownGridRows.filter(r=>r[0].trim()||r[1].trim());
+  document.getElementById('unknownInput').value=used.length?'시료명\t흡광도\t희석배수\n'+used.map(r=>[r[0],r[1],r[2]||1].join('\t')).join('\n'):'';
+}
+function addUnknownRow(){unknownGridRows.push(blankUnknownRow());renderUnknownGrid(unknownGridRows.length-1,0);}
+function deleteUnknownRow(i){unknownGridRows.splice(i,1);if(!unknownGridRows.length)unknownGridRows.push(blankUnknownRow());renderUnknownGrid();updateCalibration();}
+function clearUnknownGrid(){unknownGridRows=Array.from({length:6},blankUnknownRow);renderUnknownGrid(0,0);updateCalibration();}
+function setUnknownRowsFromText(text){
+  const lines=String(text).trim().split(/\r?\n/).filter(Boolean);if(!lines.length){clearUnknownGrid();return;}
+  const delimiter=detectDelimiter(lines[0]);let rows=lines.map(line=>typeof delimiter==='string'?line.split(delimiter):line.trim().split(delimiter));
+  if(rows[0]?.some((v,i)=>i>0&&Number.isNaN(Number(String(v).trim()))))rows=rows.slice(1);
+  unknownGridRows=rows.map(r=>[String(r[0]||'').trim(),String(r[1]||'').trim(),String(r[2]||'1').trim()]).filter(r=>r[0]||r[1]);
+  while(unknownGridRows.length<6)unknownGridRows.push(blankUnknownRow());renderUnknownGrid();updateCalibration();
+}
+function handleUnknownPaste(event){
+  const input=event.target.closest('input[data-row]');if(!input)return;
+  const text=event.clipboardData?.getData('text/plain')||'';if(!/[\t\r\n]/.test(text))return;
+  event.preventDefault();
+  const lines=text.replace(/\r/g,'').split('\n').filter((line,i,a)=>line.length||i<a.length-1);let rows=lines.map(line=>line.split('\t'));
+  if(rows[0]?.some((v,i)=>i>0&&Number.isNaN(Number(String(v).trim()))))rows=rows.slice(1);
+  const startRow=Number(input.dataset.row),startCol=Number(input.dataset.col);
+  while(unknownGridRows.length<startRow+rows.length)unknownGridRows.push(blankUnknownRow());
+  rows.forEach((row,ri)=>row.slice(0,3-startCol).forEach((value,ci)=>unknownGridRows[startRow+ri][startCol+ci]=String(value).trim()));
+  renderUnknownGrid(startRow,startCol);updateCalibration();
+}
 function currentSelectedData(){
   return selection ? rawData.filter(d=>d.x>=selection.min&&d.x<=selection.max) : [...rawData];
 }
@@ -1848,7 +1906,7 @@ function loadCalibrationDemo(){
   calibrationModel={slope:.0601,intercept:.002,r2:.9997,minX:0,maxX:10,xLabel:'농도 (mg/L)',yLabel:'흡광도',points:[0,2,4,6,8,10].map((x,i)=>({x,y:[.003,.121,.239,.362,.480,.604][i]}))};
   ['calSlope','calIntercept','calR2'].forEach((id,i)=>document.getElementById(id).value=[.0601,.002,.9997][i]);
   document.getElementById('calRange').value='0 – 10';document.getElementById('calXLabel').value=calibrationModel.xLabel;document.getElementById('calYLabel').value=calibrationModel.yLabel;
-  document.getElementById('unknownInput').value='시료명\t흡광도\t희석배수\n미지 A\t0.302\t1\n미지 B\t0.421\t10';document.getElementById('calibrationSource').textContent='교육용 데모 검량선입니다.';updateCalibration();
+  setUnknownRowsFromText('시료명\t흡광도\t희석배수\n미지 A\t0.302\t1\n미지 B\t0.421\t10');document.getElementById('calibrationSource').textContent='교육용 데모 검량선입니다.';updateCalibration();
 }
 function parseUnknowns(){
   const text=document.getElementById('unknownInput').value.trim();if(!text)return [];
@@ -1886,9 +1944,11 @@ function renderCalibrationChart(unknowns,model){
 
 /* INIT */
 
+initUnknownGrid();
 loadDemo();
 updateComparison();
 
 </script>
 </body>
 </html>
+
