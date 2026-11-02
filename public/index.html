@@ -369,11 +369,11 @@
     <div class="badge">v0.3</div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-page="imagePage">① 이미지 분석<small>그래프 이미지를 올리고 구간을 지정합니다.</small></button>
-    <button class="tab" data-page="dataPage">② 데이터 분석<small>표 데이터를 붙여넣고 수치를 분석합니다.</small></button>
-    <button class="tab" data-page="calibrationPage">③ 분광광도계 검량선<small>검량선으로 미지시료 농도를 역산합니다.</small></button>
-    <button class="tab" data-page="comparePage">④ 비교 분석 <span id="compareCount">0</span><small>조건별 기울기와 결과를 비교합니다.</small></button>
+  <div class="tabs" aria-label="그래프 분석 작업 단계">
+    <button class="tab active" data-page="imagePage">① 이미지 분석<small>그래프 이미지를 표 데이터로 재구성합니다.</small></button>
+    <button class="tab" data-page="dataPage">② 데이터 분석<small>표 데이터의 구간·회귀·면적을 분석합니다.</small></button>
+    <button class="tab result-tab" data-page="comparePage">③-1 기울기 비교 <span id="compareCount">0</span><small>여러 조건의 회귀 기울기를 비교합니다.</small></button>
+    <button class="tab result-tab" data-page="calibrationPage">③-2 검량선 분석<small>회귀식으로 미지시료 농도를 역산합니다.</small></button>
   </div>
 
   <!-- DATA MODE -->
@@ -494,8 +494,8 @@
           </div>
 
           <div class="toolbar">
-            <button class="primary" style="flex:1" onclick="addToComparison()">비교 분석에 추가</button>
-            <button class="soft" style="flex:1" onclick="sendToCalibration()">이 회귀식으로 검량선 만들기</button>
+            <button class="primary" style="flex:1" onclick="addToComparison()">③-1 기울기 비교에 추가</button>
+            <button class="soft" style="flex:1" onclick="sendToCalibration()">③-2 이 회귀식으로 검량선 분석</button>
           </div>
 
 
@@ -583,7 +583,7 @@
   <!-- SPECTROPHOTOMETER CALIBRATION -->
   <section id="calibrationPage" class="page">
     <div class="panel">
-      <div class="panel-header"><div><div class="panel-title">분광광도계 검량선 · 미지시료 역산</div><div class="panel-sub">표준용액 회귀식 Y = mX + b로 흡광도에서 농도를 계산하고 입력할 때마다 시각화합니다.</div></div><button onclick="loadCalibrationDemo()">검량선 데모</button></div>
+      <div class="panel-header"><div><div class="panel-title">③-2 분광광도계 검량선 분석</div><div class="panel-sub">표준용액 회귀식 Y = mX + b로 흡광도에서 농도를 계산하고 입력할 때마다 시각화합니다.</div></div><button onclick="loadCalibrationDemo()">검량선 데모</button></div>
       <div class="panel-body">
         <div class="calibration-layout">
           <div>
@@ -626,7 +626,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">분석 결과</div>
-            <div class="panel-sub">서로 다른 조건의 초기 반응속도를 비교합니다.</div>
+            <div class="panel-sub">데이터 분석에서 저장한 여러 조건의 회귀 기울기를 비교합니다.</div>
           </div>
         </div>
 
