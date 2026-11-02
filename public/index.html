@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <link rel="icon" type="image/png" href="/favicon.png" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ScienceGOM Graph Analyzer v0.3</title>
@@ -52,18 +51,8 @@
     }
 
     .brand h1{
-      display:flex;
-      align-items:center;
-      gap:10px;
       margin:0;
       font-size:24px;
-    }
-
-    .brand-icon{
-      width:1.67em;
-      height:1.67em;
-      flex-shrink:0;
-      object-fit:contain;
     }
 
     .brand p{
@@ -363,7 +352,8 @@
         height:390px;
       }
     }
-    .tabs .tab{flex:1;text-align:left;padding:16px 20px}.tab small{display:block;font-size:12px;font-weight:400;margin-top:6px;line-height:1.5}.input-panel{margin-bottom:18px}.input-panel .panel-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.input-panel textarea,.input-panel .hint{grid-column:1/-1}.input-panel .section-title{margin-top:0}.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}.best{font-size:10px;padding:3px 6px;border-radius:20px;background:#eaf1ff;color:#2563eb;white-space:nowrap}.axis-controls{gap:12px}.axis-controls label{font-size:12px;color:var(--muted)}.axis-controls input[type=number]{width:130px;display:block;margin-top:4px}.axis-controls .check{display:flex;align-items:center;gap:6px}.check input{width:auto}.drag-over{background:#eaf1ff;border:2px dashed #2563eb}.image-stage{min-height:450px}.comparison-grid{grid-template-columns:300px minmax(0,1fr)}input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #93b4ff;outline-offset:2px}canvas{touch-action:none}table{min-width:430px}#comparePage .panel-body{overflow-x:auto}@media(max-width:1000px){.comparison-grid{grid-template-columns:1fr}}@media(max-width:600px){.app{padding:12px}.tabs{flex-direction:column}.topbar{align-items:flex-start}.brand h1{font-size:20px}.input-panel .panel-body{display:block}.image-stage{min-height:280px}.empty{padding:24px}.panel-header{flex-wrap:wrap}}
+    .calibration-layout{display:grid;grid-template-columns:minmax(300px,.75fr) minmax(0,1.25fr);gap:24px}.calibration-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.calibration-chart{height:430px;position:relative}.calibration-chart-head{display:flex;justify-content:space-between;gap:12px}.table-scroll{overflow-x:auto}.range-ok{color:#15803d;font-weight:700}.range-warn{color:#b45309;font-weight:700}
+    .tabs .tab{flex:1;text-align:left;padding:16px 20px}.tab small{display:block;font-size:12px;font-weight:400;margin-top:6px;line-height:1.5}.input-panel{margin-bottom:18px}.input-panel .panel-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.input-panel textarea,.input-panel .hint{grid-column:1/-1}.input-panel .section-title{margin-top:0}.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}.best{font-size:10px;padding:3px 6px;border-radius:20px;background:#eaf1ff;color:#2563eb;white-space:nowrap}.axis-controls{gap:12px}.axis-controls label{font-size:12px;color:var(--muted)}.axis-controls input[type=number]{width:130px;display:block;margin-top:4px}.axis-controls .check{display:flex;align-items:center;gap:6px}.check input{width:auto}.drag-over{background:#eaf1ff;border:2px dashed #2563eb}.image-stage{min-height:450px}.comparison-grid{grid-template-columns:300px minmax(0,1fr)}input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid #93b4ff;outline-offset:2px}canvas{touch-action:none}table{min-width:430px}#comparePage .panel-body{overflow-x:auto}@media(max-width:1000px){.comparison-grid,.calibration-layout{grid-template-columns:1fr}}@media(max-width:600px){.app{padding:12px}.tabs{flex-direction:column}.topbar{align-items:flex-start}.brand h1{font-size:20px}.input-panel .panel-body{display:block}.image-stage{min-height:280px}.empty{padding:24px}.panel-header{flex-wrap:wrap}}
     [hidden]{display:none!important}
   </style>
 </head>
@@ -373,7 +363,7 @@
 
   <div class="topbar">
     <div class="brand">
-      <h1><img class="brand-icon" src="/favicon.png" alt="" width="40" height="40" /><span>ScienceGOM Graph Analyzer</span></h1>
+      <h1>ScienceGOM Graph Analyzer</h1>
       <p>실험 그래프의 특정 구간을 선택하고 변화율·회귀·면적을 분석합니다.</p>
     </div>
     <div class="badge">v0.3</div>
@@ -382,7 +372,8 @@
   <div class="tabs">
     <button class="tab active" data-page="imagePage">① 이미지 분석<small>그래프 이미지를 올리고 구간을 지정합니다.</small></button>
     <button class="tab" data-page="dataPage">② 데이터 분석<small>표 데이터를 붙여넣고 수치를 분석합니다.</small></button>
-    <button class="tab" data-page="comparePage">③ 비교 분석 <span id="compareCount">0</span><small>조건별 기울기와 결과를 비교합니다.</small></button>
+    <button class="tab" data-page="calibrationPage">③ 분광광도계 검량선<small>검량선으로 미지시료 농도를 역산합니다.</small></button>
+    <button class="tab" data-page="comparePage">④ 비교 분석 <span id="compareCount">0</span><small>조건별 기울기와 결과를 비교합니다.</small></button>
   </div>
 
   <!-- DATA MODE -->
@@ -502,9 +493,10 @@
             <input id="compareLabel" value="실험 조건 1">
           </div>
 
-          <button class="primary" style="width:100%" onclick="addToComparison()">
-            비교 분석에 추가
-          </button>
+          <div class="toolbar">
+            <button class="primary" style="flex:1" onclick="addToComparison()">비교 분석에 추가</button>
+            <button class="soft" style="flex:1" onclick="sendToCalibration()">이 회귀식으로 검량선 만들기</button>
+          </div>
 
 
         </div>
@@ -588,6 +580,44 @@
     <textarea id="recognizedData" aria-label="재구성 데이터 표" oninput="saveRecognizedEdits()"></textarea>
     <div class="toolbar"><button class="primary" onclick="useRecognizedData()">확인한 표를 데이터 분석으로 보내기</button><button onclick="downloadRecognizedCSV()">CSV 다운로드</button></div></div>
   </section>
+  <!-- SPECTROPHOTOMETER CALIBRATION -->
+  <section id="calibrationPage" class="page">
+    <div class="panel">
+      <div class="panel-header"><div><div class="panel-title">분광광도계 검량선 · 미지시료 역산</div><div class="panel-sub">표준용액 회귀식 Y = mX + b로 흡광도에서 농도를 계산하고 입력할 때마다 시각화합니다.</div></div><button onclick="loadCalibrationDemo()">검량선 데모</button></div>
+      <div class="panel-body">
+        <div class="calibration-layout">
+          <div>
+            <div class="section-title">STEP 1 · 검량선 확인</div>
+            <div id="calibrationSource" class="notice">데이터 분석에서 표준용액의 농도(X)와 흡광도(Y)를 분석한 뒤 ‘이 회귀식으로 검량선 만들기’를 누르세요.</div>
+            <div class="calibration-fields">
+              <div class="field"><label>기울기 m</label><input id="calSlope" type="number" step="any" oninput="updateCalibration()"></div>
+              <div class="field"><label>절편 b</label><input id="calIntercept" type="number" step="any" oninput="updateCalibration()"></div>
+              <div class="field"><label>R²</label><input id="calR2" type="number" step="any" readonly></div>
+              <div class="field"><label>표준 농도 범위</label><input id="calRange" readonly></div>
+              <div class="field"><label>X축 이름·단위</label><input id="calXLabel" value="농도" oninput="updateCalibration()"></div>
+              <div class="field"><label>Y축 이름·단위</label><input id="calYLabel" value="흡광도" oninput="updateCalibration()"></div>
+            </div>
+            <div class="section-title">STEP 2 · 미지시료 입력</div>
+            <p class="hint">Excel·Google Sheets에서 붙여넣을 수 있습니다. 입력할 때마다 농도와 그래프가 즉시 갱신됩니다.</p>
+            <textarea id="unknownInput" oninput="updateCalibration()" placeholder="시료명&#9;흡광도&#9;희석배수&#10;미지 A&#9;0.302&#9;1&#10;미지 B&#9;0.421&#9;10"></textarea>
+            <div class="two">
+              <div class="field"><label>블랭크 흡광도</label><input id="calBlank" type="number" step="any" value="0" oninput="updateCalibration()"></div>
+              <div class="field"><label>표시 소수 자릿수</label><select id="calDigits" onchange="updateCalibration()"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></div>
+            </div>
+          </div>
+          <div>
+            <div class="calibration-chart-head"><div><div class="section-title">STEP 3 · 실시간 시각화</div><p id="calEquation" class="selection-readout">검량선을 불러와 주세요.</p></div><div id="calLegend" class="hint"></div></div>
+            <div class="calibration-chart"><canvas id="calibrationChart"></canvas></div>
+            <p class="hint">색 점은 미지시료의 보정 흡광도입니다. 점선은 흡광도에서 검량선까지 이동해 역산된 농도를 읽는 과정을 나타냅니다.</p>
+          </div>
+        </div>
+        <div class="section-title">STEP 4 · 역산값 비교</div>
+        <div id="calibrationSummary" class="notice">미지시료를 입력하면 결과를 비교할 수 있습니다.</div>
+        <div class="table-scroll"><table><thead><tr><th>시료</th><th>측정 흡광도</th><th>블랭크 보정</th><th>역산 농도</th><th>희석배수</th><th>원시료 농도</th><th>검량 범위</th></tr></thead><tbody id="calibrationTable"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
   <!-- COMPARISON -->
   <section id="comparePage" class="page">
     <div class="comparison-grid">
@@ -1793,6 +1823,66 @@ const learningLinePlugin={id:'learningLine',afterDatasetsDraw(chart){
   ctx.restore();
 }};
 Chart.register(learningLinePlugin);
+
+
+let calibrationModel=null,calibrationChart=null;
+const calibrationColors=['#2563eb','#ea580c','#7c3aed','#059669','#db2777','#0891b2','#a16207','#4f46e5'];
+function currentSelectedData(){
+  return selection ? rawData.filter(d=>d.x>=selection.min&&d.x<=selection.max) : [...rawData];
+}
+function sendToCalibration(){
+  if(!currentStats || !Number.isFinite(currentStats.slope) || Math.abs(currentStats.slope)<1e-12){alert('기울기가 0이 아닌 검량선 데이터를 먼저 분석해주세요.');return;}
+  const points=currentSelectedData();
+  const xLabel=document.getElementById('xColumn').selectedOptions?.[0]?.text || '농도';
+  const yLabel=document.getElementById('yColumn').selectedOptions?.[0]?.text || '흡광도';
+  calibrationModel={slope:currentStats.slope,intercept:currentStats.intercept,r2:currentStats.r2,minX:Math.min(...points.map(p=>p.x)),maxX:Math.max(...points.map(p=>p.x)),points,xLabel,yLabel};
+  document.getElementById('calSlope').value=Number(calibrationModel.slope.toPrecision(10));
+  document.getElementById('calIntercept').value=Number(calibrationModel.intercept.toPrecision(10));
+  document.getElementById('calR2').value=f(calibrationModel.r2,5);
+  document.getElementById('calRange').value=`${f(calibrationModel.minX,4)} – ${f(calibrationModel.maxX,4)}`;
+  document.getElementById('calXLabel').value=xLabel;document.getElementById('calYLabel').value=yLabel;
+  document.getElementById('calibrationSource').textContent=`${points.length}개 표준점에서 만든 검량선입니다. 이미지 추정 데이터를 사용했다면 역산값도 추정값입니다.`;
+  document.querySelector('[data-page="calibrationPage"]').click();updateCalibration();
+}
+function loadCalibrationDemo(){
+  calibrationModel={slope:.0601,intercept:.002,r2:.9997,minX:0,maxX:10,xLabel:'농도 (mg/L)',yLabel:'흡광도',points:[0,2,4,6,8,10].map((x,i)=>({x,y:[.003,.121,.239,.362,.480,.604][i]}))};
+  ['calSlope','calIntercept','calR2'].forEach((id,i)=>document.getElementById(id).value=[.0601,.002,.9997][i]);
+  document.getElementById('calRange').value='0 – 10';document.getElementById('calXLabel').value=calibrationModel.xLabel;document.getElementById('calYLabel').value=calibrationModel.yLabel;
+  document.getElementById('unknownInput').value='시료명\t흡광도\t희석배수\n미지 A\t0.302\t1\n미지 B\t0.421\t10';document.getElementById('calibrationSource').textContent='교육용 데모 검량선입니다.';updateCalibration();
+}
+function parseUnknowns(){
+  const text=document.getElementById('unknownInput').value.trim();if(!text)return [];
+  const lines=text.split(/\r?\n/).filter(Boolean),delimiter=detectDelimiter(lines[0]);
+  let rows=lines.map(line=>typeof delimiter==='string'?line.split(delimiter):line.trim().split(delimiter));
+  if(rows[0]?.some((v,i)=>i>0&&Number.isNaN(Number(v.trim()))))rows=rows.slice(1);
+  return rows.map((r,i)=>({name:(r[0]||`시료 ${i+1}`).trim(),y:Number(r[1]),dilution:r[2]?.trim()===''||r[2]===undefined?1:Number(r[2])})).filter(r=>r.name&&Number.isFinite(r.y)&&Number.isFinite(r.dilution)&&r.dilution>0);
+}
+function inverseCalibration(y,m,b,blank=0){const corrected=y-blank;return {corrected,x:(corrected-b)/m};}
+function updateCalibration(){
+  const m=Number(document.getElementById('calSlope').value),b=Number(document.getElementById('calIntercept').value),blank=Number(document.getElementById('calBlank').value||0);
+  const xLabel=document.getElementById('calXLabel').value||'농도',yLabel=document.getElementById('calYLabel').value||'흡광도';
+  if(!calibrationModel || !Number.isFinite(m)||!Number.isFinite(b)||Math.abs(m)<1e-12){document.getElementById('calEquation').textContent='기울기가 0이 아닌 검량선을 불러와 주세요.';renderCalibrationChart([],null);return;}
+  calibrationModel.slope=m;calibrationModel.intercept=b;calibrationModel.xLabel=xLabel;calibrationModel.yLabel=yLabel;
+  const unknowns=parseUnknowns().map((u,i)=>{const inv=inverseCalibration(u.y,m,b,blank);return {...u,...inv,originalX:inv.x*u.dilution,color:calibrationColors[i%calibrationColors.length],inRange:inv.x>=calibrationModel.minX&&inv.x<=calibrationModel.maxX};});
+  const digits=Number(document.getElementById('calDigits').value||3);
+  document.getElementById('calEquation').textContent=`${yLabel} = ${f(m,6)} × ${xLabel} + ${f(b,6)}`;
+  document.getElementById('calLegend').textContent=`역산식: ${xLabel} = (${yLabel} − ${f(b,6)}) ÷ ${f(m,6)}`;
+  document.getElementById('calibrationTable').innerHTML=unknowns.map(u=>`<tr><td><span class="color-dot" style="background:${u.color}"></span>${escapeHtml(u.name)}</td><td>${u.y.toFixed(digits)}</td><td>${u.corrected.toFixed(digits)}</td><td style="color:${u.color};font-weight:800">${u.x.toFixed(digits)}</td><td>${f(u.dilution,4)}</td><td style="font-weight:800">${u.originalX.toFixed(digits)}</td><td class="${u.inRange?'range-ok':'range-warn'}">${u.inRange?'범위 내':'범위 밖 · 외삽'}</td></tr>`).join('');
+  const outside=unknowns.filter(u=>!u.inRange).length;
+  document.getElementById('calibrationSummary').textContent=unknowns.length?`${unknowns.length}개 시료를 역산했습니다. ${outside?outside+'개가 표준 농도 범위를 벗어났습니다. 희석 또는 재측정을 확인하세요.':'모든 시료의 측정 농도가 검량 범위 안에 있습니다.'} 희석배수는 원시료 농도에만 적용됩니다.`:'미지시료를 입력하면 결과를 비교할 수 있습니다.';
+  renderCalibrationChart(unknowns,{m,b,xLabel,yLabel});
+}
+function renderCalibrationChart(unknowns,model){
+  if(calibrationChart)calibrationChart.destroy();
+  const ctx=document.getElementById('calibrationChart');if(!ctx)return;
+  const datasets=[];
+  if(model&&calibrationModel){
+    datasets.push({label:'표준용액',data:calibrationModel.points,showLine:false,pointRadius:5,backgroundColor:'#64748b'});
+    datasets.push({label:'검량선',data:[{x:calibrationModel.minX,y:model.m*calibrationModel.minX+model.b},{x:calibrationModel.maxX,y:model.m*calibrationModel.maxX+model.b}],showLine:true,pointRadius:0,borderColor:'#172033',borderWidth:2});
+    unknowns.forEach(u=>{datasets.push({label:u.name,data:[{x:u.x,y:u.corrected}],pointRadius:7,backgroundColor:u.color,borderColor:u.color});datasets.push({label:u.name+' 역산선',data:[{x:calibrationModel.minX,y:u.corrected},{x:u.x,y:u.corrected},{x:u.x,y:model.m*calibrationModel.minX+model.b}],showLine:true,pointRadius:0,borderColor:u.color,borderDash:[5,4],borderWidth:1});});
+  }
+  calibrationChart=new Chart(ctx,{type:'scatter',data:{datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'nearest',intersect:false},plugins:{legend:{labels:{filter:item=>!item.text.endsWith('역산선')}}},scales:{x:{type:'linear',title:{display:true,text:model?.xLabel||'농도'}},y:{title:{display:true,text:model?.yLabel||'흡광도'}}}}});
+}
 
 /* INIT */
 
